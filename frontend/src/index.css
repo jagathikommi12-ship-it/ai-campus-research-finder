@@ -1,28 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&family=DM+Serif+Display:ital@0;1&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:         #111113;
-  --surface:    #1c1c20;
-  --surface2:   #242428;
-  --border:     #2e2e34;
-  --border2:    #3a3a42;
-  --text:       #edeaf4;
-  --text-soft:  #a09cb0;
-  --text-faint: #5c5870;
-  --accent:     #b084f8;
-  --accent-dim: #7c4fcf30;
-  --green:      #4ade80;
-  --green-bg:   #0d2e1a;
-  --yellow:     #fbbf24;
-  --yellow-bg:  #2d1f00;
-  --red:        #f87171;
-  --red-bg:     #2e0d0d;
-  --blue:       #60a5fa;
-  --blue-bg:    #0d1f3c;
+  --bg:         #fff9fb;
+  --surface:    #ffffff;
+  --surface2:   #fff0f5;
+  --border:     #fce4ec;
+  --border2:    #f8bbcf;
+  --text:       #2d1a24;
+  --text-soft:  #7c4f65;
+  --text-faint: #c9a0b4;
+  --accent:     #e8638c;
+  --accent-dark: #d04d78;
+  --accent-dim: #fce4ec;
+  --green:      #52b788;
+  --green-bg:   #f0faf6;
+  --yellow:     #f4845f;
+  --yellow-bg:  #fff4f0;
+  --red:        #e05c7a;
+  --red-bg:     #fff0f3;
+  --blue:       #9b72cf;
+  --blue-bg:    #f5eeff;
+  --shadow-sm:  0 2px 8px rgba(232, 99, 140, 0.08);
+  --shadow-md:  0 4px 20px rgba(232, 99, 140, 0.12);
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Nunito', system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;

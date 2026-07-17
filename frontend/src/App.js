@@ -7,15 +7,16 @@ import localforage from 'localforage';
 const API = 'http://localhost:3001';
 
 export default function App() {
-  const [view, setView]               = useState('search'); // 'search' | 'results'
-  const [page, setPage]               = useState('finder'); // 'finder' | 'tracker'
+  const [view, setView]               = useState('search');
+  const [page, setPage]               = useState('finder');
   const [loading, setLoading]         = useState(false);
   const [professors, setProfessors]   = useState([]);
-  const [searchMeta, setSearchMeta]   = useState(null); // { topic, studentBackground }
-  const [tracked, setTracked]         = useState([]);   // [{ prof, status, addedAt }]
+  const [searchMeta, setSearchMeta]   = useState(null);
+  const [tracked, setTracked]         = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [resumeData, setResumeData]   = useState(null);
+  const [searchError, setSearchError] = useState('');
 
-  // Load departments on mount
   useEffect(() => {
     fetch(`${API}/api/departments`)
       .then(r => r.json())
@@ -23,7 +24,6 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  // Load tracker from localforage
   useEffect(() => {
     localforage.getItem('research-tracker').then(val => {
       if (val) setTracked(val);
@@ -35,19 +35,22 @@ export default function App() {
     localforage.setItem('research-tracker', list);
   };
 
-  const handleSearch = async ({ topic, selectedDepts, studentBackground }) => {
+  const handleSearch = async ({ topic, selectedDepts }) => {
     setLoading(true);
     setView('results');
+    setSearchError('');
     try {
       const res = await fetch(`${API}/api/professors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, departments: selectedDepts, studentBackground })
+        body: JSON.stringify({ topic, departments: selectedDepts })
       });
       const data = await res.json();
-      setProfessors(data.professors || []);
-      setSearchMeta({ topic, studentBackground });
-    } catch {
+      if (data.error) { setSearchError(data.error); setProfessors([]); }
+      else { setProfessors(data.professors || []); }
+      setSearchMeta({ topic });
+    } catch (err) {
+      setSearchError(`Could not reach the backend. Is it running? (${err.message})`);
       setProfessors([]);
     } finally {
       setLoading(false);
@@ -55,8 +58,7 @@ export default function App() {
   };
 
   const handleTrack = (prof) => {
-    const already = tracked.find(t => t.prof.name === prof.name && t.prof.department === prof.department);
-    if (already) return;
+    if (tracked.find(t => t.prof.name === prof.name && t.prof.department === prof.department)) return;
     saveTracked([...tracked, { prof, status: 'emailed', addedAt: new Date().toISOString() }]);
   };
 
@@ -66,10 +68,7 @@ export default function App() {
     saveTracked(updated);
   };
 
-  const handleDeleteTracked = (idx) => {
-    const updated = tracked.filter((_, i) => i !== idx);
-    saveTracked(updated);
-  };
+  const handleDeleteTracked = (idx) => saveTracked(tracked.filter((_, i) => i !== idx));
 
   const isTracked = (prof) => tracked.some(t => t.prof.name === prof.name && t.prof.department === prof.department);
 
@@ -77,16 +76,10 @@ export default function App() {
     <div className="app">
       <nav className="nav">
         <span className="nav-logo">research<span>finder</span></span>
-        <button
-          className={`nav-btn ${page === 'finder' ? 'active' : ''}`}
-          onClick={() => setPage('finder')}
-        >
+        <button className={`nav-btn ${page === 'finder' ? 'active' : ''}`} onClick={() => setPage('finder')}>
           Find Professors
         </button>
-        <button
-          className={`nav-btn ${page === 'tracker' ? 'active' : ''}`}
-          onClick={() => setPage('tracker')}
-        >
+        <button className={`nav-btn ${page === 'tracker' ? 'active' : ''}`} onClick={() => setPage('tracker')}>
           My Outreach {tracked.length > 0 && `(${tracked.length})`}
         </button>
       </nav>
@@ -102,6 +95,9 @@ export default function App() {
           onSearch={handleSearch}
           onTrack={handleTrack}
           onNewSearch={() => setView('search')}
+          searchError={searchError}
+          onResumeChange={setResumeData}
+          resumeData={resumeData}
           API={API}
         />
       )}

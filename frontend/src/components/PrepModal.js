@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function PrepModal({ prof, API, onClose }) {
   const [prep, setPrep]       = useState(null);
@@ -14,9 +15,9 @@ export default function PrepModal({ prof, API, onClose }) {
       .then(data => setPrep(data))
       .catch(() => setPrep(null))
       .finally(() => setLoading(false));
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return (
+  return createPortal(
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
@@ -36,21 +37,18 @@ export default function PrepModal({ prof, API, onClose }) {
                   <div key={i} className="prep-item">{c}</div>
                 ))}
               </div>
-
               <div className="prep-section">
                 <div className="prep-section-title">Questions to ask</div>
                 {prep.questionsToAsk?.map((q, i) => (
                   <div key={i} className="prep-item">{q}</div>
                 ))}
               </div>
-
               <div className="prep-section">
                 <div className="prep-section-title">Don't say</div>
                 {prep.doNotSay?.map((d, i) => (
                   <div key={i} className="prep-item avoid">{d}</div>
                 ))}
               </div>
-
               <div className="prep-section">
                 <div className="prep-section-title">Opening line</div>
                 <div className="prep-opening">{prep.openingLine}</div>
@@ -62,6 +60,7 @@ export default function PrepModal({ prof, API, onClose }) {
           <button className="btn-secondary" onClick={onClose}>Close</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
